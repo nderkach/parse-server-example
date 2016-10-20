@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include wineHeader%>
+
+    <title>Vinus</title>
+
+    <link href="/css/mobile.css" media="screen, projection" rel="stylesheet" type="text/css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <% include wineGA %>
+</head>
+<body>
+<a class="open" href="<%= iosAppUrl %>">Download the app</a>
+
+<div id="header">
+    <img src="<%= imageUrl %>" height="320" width="320">
+</div>
+
+<div id="name">
+    <% if(!!wineName){ %>
+    <h2><%= wineName %><br>
+        <%= wineMaker %>
+    </h2>
+    <% } %>
+    <!-- 			<h6><i class="ss-icon">camera</i> via Vinus</h6> -->
+    <h6>captured via Vinus</h6>
+</div>
+
+<div id="wrapper">
+    <div class="meta-data">
+        <div class="location">
+            <!-- 						<h4><i class="ss-icon">location</i> <div class="location-name">Hurstville Library</div></h4> -->
+            <div class="clearfix"></div>
+        </div>
+
+        <!-- 				<div class="people"> -->
+        <!-- 				<h4><i class="ss-icon">avatars</i></h4> -->
+        <!-- 					<ul> -->
+        <!-- 						<li> -->
+        <!-- 							<img src="http://graph.facebook.com/612096632/picture" width="30" height="30"> -->
+        <!-- 						</li> -->
+        <!-- 					</ul> -->
+        <!-- 				</div> -->
+    </div>
+    <ul class="comments">
+        <li>
+            <!--   <div class="avatar"> -->
+            <!--     <img src="http://graph.facebook.com/744698419/picture?type=normal" width="30" height="30"> -->
+            <!--   </div> -->
+            <div class="comment">
+                <h4><%= ownerName %><span><%= displayTime %></span></h4>
+
+                <p><%= content %></p>
+            </div>
+        </li>
+
+        <li style="text-align: center">
+            <a class="badge" href="<%= iosAppUrl %>">
+                <img alt="App_store_badge" src="/images/appStoreBadge.svg" width="132"/></a>
+        </li>
+    </ul>
+
+
+    <div class="reply">
+        <p><%= ownerName %> and your friends are using Vinus<br> to find and share wines they love.</p>
+    </div>
+</div>
+<footer>
+    <p>Vinus &copy; 2013</p>
+</footer>
+
+</body>
+
+</html>
