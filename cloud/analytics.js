@@ -5,11 +5,11 @@ var exports;
 (function() {
     'use strict';
 
-    var env = require('./cloud/env.js').env;
+    var env = require('./env.js').env;
     var _ = require('underscore');
     var Buffer = require('buffer').Buffer;
-    var dates = require('./cloud/dates.js');
-    var moment = require('./cloud/moment.min.js');
+    var dates = require('./dates.js');
+    var moment = require('moment');
 
     var MIXPANEL_TRACK_URL = 'http://api.mixpanel.com/track';
     var MIXPANEL_ENGAGE_URL = 'http://api.mixpanel.com/engage';

@@ -9,10 +9,14 @@
   },
   "license": "MIT",
   "dependencies": {
+    "basic-auth-connect": "^1.0.0",
     "express": "~4.11.x",
     "kerberos": "~0.0.x",
+    "md5": "^2.2.1",
+    "moment": "^2.15.1",
     "parse": "~1.8.0",
-    "parse-server": "*"
+    "parse-server": "*",
+    "underscore": "^1.8.3"
   },
   "scripts": {
     "start": "node index.js"

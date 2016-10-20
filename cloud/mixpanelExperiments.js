@@ -8,8 +8,8 @@ var exports;
     'use strict';
 
     var _ = require('underscore');
-    var moment = require('./cloud/moment.min.js');
-    var mixpanelImports = require('./cloud/mixpanelImports.js');
+    var moment = require('moment');
+    var mixpanelImports = require('./mixpanelImports.js');
 
     var UserStats = Parse.Object.extend('UserStats');
     var MixpanelImports = Parse.Object.extend('MixpanelImports');

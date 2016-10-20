@@ -7,12 +7,12 @@ var exports;
 (function() {
     'use strict';
     var _ = require('underscore');
-    var analytics = require('./cloud/analytics.js');
-    var promises = require('./cloud/promises.js');
-    var moment = require('./cloud/moment.min.js');
-    var acls = require('./cloud/acls.js');
-    var env = require('./cloud/env.js').env;
-    var activityService = require('./cloud/activities.js');
+    var analytics = require('./analytics.js');
+    var promises = require('./promises.js');
+    var moment = require('moment');
+    var acls = require('./acls.js');
+    var env = require('./env.js').env;
+    var activityService = require('./activities.js');
     var ActivityType = activityService.ActivityType;
 
     var Post = Parse.Object.extend('Post');

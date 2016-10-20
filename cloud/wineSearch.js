@@ -83,7 +83,6 @@ var exports;
         if (keyword === "NF") { keyword = null; }
         if (!!keyword && (!lastFetched || Date.now() - lastFetched.getTime() > MIN_REFRESH_MS)) {
             return findLatestPrice(keyword).then(function(vintage) {
-                Parse.Cloud.useMasterKey();
                 if (vintage) {
                     wine.set('wsLastFetched', new Date());
                     wine.set('wsLastVintage', vintage['vintage']);
@@ -100,7 +99,7 @@ var exports;
                     wine.unset('wsPriceMax');
                     console.log("Couldn't find latest vintage price for wine " + wine.id + ", [" + keyword + "]");
                 }
-                return wine.save();
+                return wine.save({useMasterKey: true});
             }, function() {
                 var msg = 'Failed to update wine: ' + wine.id;
                 console.log(msg);
@@ -113,7 +112,6 @@ var exports;
     }
 
     Parse.Cloud.job("fetchRecentWinePrices", function(request, status) {
-        Parse.Cloud.useMasterKey();
 
         function refreshPrices(wines) {
             console.log("Refreshing prices for wines: " + _.map(wines, function(wine) {return wine.id;}));

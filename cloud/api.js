@@ -11,12 +11,12 @@ var exports;
     'use strict';
 
     var _ = require('underscore');
-    var auth = require('./cloud/auth.js');
-    var requests = require('./cloud/requests.js');
-    var analytics = require('./cloud/analytics.js');
-    var notifications = require('./cloud/notifications.js');
-    var ActivityType = require('./cloud/activities.js').ActivityType;
-    var moment = require('./cloud/moment.min.js');
+    var auth = require('./auth.js');
+    var requests = require('./requests.js');
+    var analytics = require('./analytics.js');
+    var notifications = require('./notifications.js');
+    var ActivityType = require('./activities.js').ActivityType;
+    var moment = require('moment');
 
     var Post = Parse.Object.extend('Post');
     var Activity = Parse.Object.extend('Activity');
@@ -31,7 +31,7 @@ var exports;
     }
 
     exports.queryWineLog = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
 
@@ -40,7 +40,7 @@ var exports;
         query.include("owner");
         query.skip(skip).limit(limit);
 
-        query.find().then(function(posts) {
+        query.find({sessionToken: currentUser.getSessionToken()}).then(function(posts) {
             response.success(posts);
         }, function(err) {
             response.error(err);
@@ -48,14 +48,14 @@ var exports;
     };
 
     exports.queryWineLogV2 = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
 
         var postsQuery = queryWineLogBase(currentUser);
         postsQuery.skip(skip).limit(limit);
 
-        var postsPromise = postsQuery.find();
+        var postsPromise = postsQuery.find({sessionToken: currentUser.getSessionToken()});
 
         var winesPromise = postsPromise.then(function(posts) {
             return fetchWinesFromPosts(posts);
@@ -116,7 +116,7 @@ var exports;
 
     // deprecated in favour of V2, but still needed for older clients
     exports.queryFollowingTimeline = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
 
@@ -133,7 +133,7 @@ var exports;
     };
 
     exports.queryFollowingTimelineV2 = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
 
@@ -156,7 +156,7 @@ var exports;
     };
 
     exports.queryFollowingTimelineV3 = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
 
@@ -278,7 +278,7 @@ var exports;
     }
 
     exports.queryNews = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var activityTypesList = requests.requireStringArrayParam(request, 'activityTypes');
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 10;
@@ -293,7 +293,7 @@ var exports;
 
         var countPromise = skip === 0 ? query.count() : Parse.Promise.as(undefined);
 
-        Parse.Promise.when(query.skip(skip).limit(limit).find(), countPromise).then(function(activities, totalCount) {
+        Parse.Promise.when(query.skip(skip).limit(limit).find({sessionToken: currentUser.getSessionToken()}), countPromise).then(function(activities, totalCount) {
             var responseObj = {'activities': activities};
             if (totalCount !== undefined) {
                 responseObj.totalCount = totalCount;
@@ -305,14 +305,14 @@ var exports;
     };
 
     exports.queryNewsV2 = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var activityTypesList = requests.requireStringArrayParam(request, 'activityTypes');
         var skip = request.params.skip || 0;
         var limit = request.params.limit || 20;
 
         var query = newsBaseQuery(currentUser, activityTypesList);
 
-        var activitiesPromise = query.skip(skip).limit(limit).find();
+        var activitiesPromise = query.skip(skip).limit(limit).find({sessionToken: currentUser.getSessionToken()});
 
         var postsPromise = activitiesPromise.then(function(activities) {
             return fetchPostsFromActivities(activities);
@@ -351,7 +351,7 @@ var exports;
     };
 
     exports.queryWinesForUserProfile = function(request, response) {
-        var currentUser = Parse.User.current();
+        var currentUser = request.user;
         var userId = request.params.userId;
         var targetUser = new Parse.User();
         targetUser.id = userId;
@@ -370,7 +370,7 @@ var exports;
         // UPD: default limit is 100
         postsQuery.limit(1000);
 
-        var postsPromise = postsQuery.find();
+        var postsPromise = postsQuery.find({sessionToken: currentUser.getSessionToken()});
 
         var winesPromise = postsPromise.then(function(posts) {
             return fetchWinesFromPosts(posts);

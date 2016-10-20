@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 (function(){
-  var crypt = require('./cloud/crypt'),
-      utf8 = require('./cloud/charenc.js').utf8,
-      bin = require('./cloud/charenc.js').bin,
+  var crypt = require('./crypt'),
+      utf8 = require('./charenc.js').utf8,
+      bin = require('./charenc.js').bin,
 
   // The core
   md5 = function (message, options) {

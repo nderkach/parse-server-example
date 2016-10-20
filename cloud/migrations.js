@@ -2,7 +2,7 @@
     'use strict';
 
     var _ = require('underscore');
-    var notifications = require('./cloud/notifications.js');
+    var notifications = require('./notifications.js');
 
     Parse.Cloud.job("migrateNotificationSettings", function(request, status) {
         var query = new Parse.Query(Parse.User);

@@ -32,6 +32,8 @@ var exports;
     };
 
     exports.requireStringArrayParam = function(request, paramName) {
+        console.log(request);
+        console.log(paramName);
         var value = request.params[paramName];
         if (!value.hasOwnProperty('length')) {
             throw "expected array value for parameter '" + paramName + "'";

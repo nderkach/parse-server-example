@@ -5,12 +5,11 @@
 var exports;
 
 (function() {
-    var auth = require('./cloud/auth.js');
-    var r = require('./cloud/requests.js');
+    var auth = require('./auth.js');
+    var r = require('./requests.js');
 
     exports.updatePost = function(request, response) {
         auth.requireAdmin().then(function() {
-            Parse.Cloud.useMasterKey();
             var postId = request.params.postId;
             var rating = request.params.rating;
             var content = request.params.content;
@@ -19,6 +18,7 @@ var exports;
 
             var query = new Parse.Query("Post");
             query.get(postId, {
+                useMasterKey: true,
                 success:function(post){
                     post.set('rating',rating);
                     post.set('post_content',content);
@@ -41,7 +41,6 @@ var exports;
 
     exports.userOperation = function(request, response) {
         auth.requireAdmin().then(function() {
-            Parse.Cloud.useMasterKey();
 
             var operation = request.params.operation;
             var userId = request.params.userId;
@@ -50,6 +49,7 @@ var exports;
             if(operation=="update"){//update user
                 query = new Parse.Query("User");
                 query.get(userId,{
+                    useMasterKey: true,
                     success:function(user){
                         if(request.params.firstname) user.set('firstname',request.params.firstname);
                         if(request.params.lastname) user.set('lastname',request.params.lastname);

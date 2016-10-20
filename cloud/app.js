@@ -2,19 +2,22 @@
 
 var express = require('express');
 var moment = require('moment');
-var env = require('./cloud/env.js').env;
-var dashboard = require('./cloud/dashboard.js');
+var env = require('./env.js').env;
+var dashboard = require('./dashboard.js');
+var basicAuth = require('basic-auth-connect');
 
 // Initialise express
 var app = express();
 
 // Initialise app
-app.set('views', './cloud/views');
+app.set('views', './views');
 app.set('view engine', 'ejs');
-app.use(express.bodyParser());
+// app.use(express.bodyParser());
 
 var termsOfServicePath = '/terms-of-service';
 var privacyPolicyPath = '/privacy-policy';
+
+app.use(basicAuth('admin', '104commonwealth'));
 
 // Routing
 app.get('/', homepageRedirect(''));
@@ -25,14 +28,14 @@ app.get('/mobile-privacy-policy', homepageRedirect(privacyPolicyPath));
 app.get('/invite', inviteHandler);
 app.get('/wine/:postId', postHandler);
 app.get('/:postId', postHandler);
-app.get('/dashboard/users', express.basicAuth('admin', '104commonwealth'), dashboard.usersHandler);
-app.get('/dashboard/clearStats', express.basicAuth('admin', '104commonwealth'), dashboard.clearStatsHandler);
-app.get('/dashboard/cohortStats', express.basicAuth('admin', '104commonwealth'), dashboard.cohortStatsHandler);
-app.get('/dashboard/statsUpdateJob', express.basicAuth('admin', '104commonwealth'), dashboard.statsUpdateJob);
-app.get('/dashboard/userStatsCounts', express.basicAuth('admin', '104commonwealth'), dashboard.userStatsCountsHandler);
-app.get('/dashboard/appAnnieTest', express.basicAuth('admin', '104commonwealth'), dashboard.appAnnieTestHandler);
-app.get('/dashboard/mixpanelTest', express.basicAuth('admin', '104commonwealth'), dashboard.mixpanelTestHandler);
-app.post('/dashboard/updateFacebookToken', express.basicAuth('admin', '104commonwealth'), dashboard.updateFacebookTokenHandler);
+app.get('/dashboard/users', dashboard.usersHandler);
+app.get('/dashboard/clearStats', dashboard.clearStatsHandler);
+app.get('/dashboard/cohortStats', dashboard.cohortStatsHandler);
+app.get('/dashboard/statsUpdateJob', dashboard.statsUpdateJob);
+app.get('/dashboard/userStatsCounts', dashboard.userStatsCountsHandler);
+app.get('/dashboard/appAnnieTest', dashboard.appAnnieTestHandler);
+app.get('/dashboard/mixpanelTest', dashboard.mixpanelTestHandler);
+app.post('/dashboard/updateFacebookToken', dashboard.updateFacebookTokenHandler);
 
 // Handlers
 

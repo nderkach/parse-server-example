@@ -1,7 +1,7 @@
 'use strict'
 
 var _ = require('underscore');
-var env = require('./cloud/env.js').env;
+var env = require('./env.js').env;
 
 var appUserObject = {
 	'Roger' : {

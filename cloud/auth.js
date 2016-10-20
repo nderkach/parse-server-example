@@ -6,10 +6,9 @@ var exports;
 
 (function() {
     /**
-     * Returns a promise which resolves iff the current user is admin.
+     * Returns a promise which resolves if the current user is admin.
      */
-    function requireAdmin() {
-        var currentUser = Parse.User.current();
+    function requireAdmin(currentUser) {
         if (!currentUser) {
             return Parse.Promise.error("No user");
         }

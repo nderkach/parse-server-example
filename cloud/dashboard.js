@@ -7,14 +7,14 @@ var exports;
 (function () {
     'use strict';
     var _ = require('underscore');
-    var moment = require('./cloud/moment.min.js');
-    var math = require('./cloud/math.min.js');
-    var dates = require('./cloud/dates.js');
-    var mixpanelExports = require('./cloud/mixpanel.js');
-    var fbutil = require('./cloud/fbutil.js');
-    var analytics = require('./cloud/analytics.js');
-    var queries = require('./cloud/queries.js');
-    var coreActions = require('./cloud/coreActions.js');
+    var moment = require('moment');
+    var math = require('./math.min.js');
+    var dates = require('./dates.js');
+    var mixpanelExports = require('./mixpanel.js');
+    var fbutil = require('./fbutil.js');
+    var analytics = require('./analytics.js');
+    var queries = require('./queries.js');
+    var coreActions = require('./coreActions.js');
 
     var User = Parse.Object.extend('User');
     var Post = Parse.Object.extend('Post');
@@ -341,9 +341,11 @@ var exports;
             }
 
             return getFacebookAdsToken().then(function(fbAdsToken) {
+                // var date = new Date();
                 return fbAdsToken.save({
                     accessToken: data.accessToken,
-                    expires: moment().add('seconds', data.expirySeconds).toDate()
+                    // expires: date.setSeconds(t.getSeconds() + data.expirySeconds)
+                    expires: moment().add(data.expirySeconds).toDate()
                 }, {useMasterKey: true});
             }).then(function() {
                 return 'Successfully exchanged token, expires in ' + expiryDays + ' days';

@@ -3,7 +3,7 @@ var exports;
 (function () {
     'use strict';
 
-    var moment = require('./cloud/moment.min.js');
+    var moment = require('moment');
 
     // 2013-06-03, month is 0-based :(
     var START_OF_WEEK_ZERO = moment([2013, 6 - 1, 3]); // Monday

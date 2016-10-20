@@ -3,9 +3,9 @@ var exports;
 (function () {
     'use strict';
 
-    var md5 = require('./cloud/md5.js');
-    var dates = require('./cloud/dates.js');
-    var env = require('./cloud/env.js').env;
+    var md5 = require('./md5.js');
+    var dates = require('./dates.js');
+    var env = require('./env.js').env;
 
     var API_KEY = env.mixpanelApiKey;
     var API_SECRET = env.mixpanelApiSecret;

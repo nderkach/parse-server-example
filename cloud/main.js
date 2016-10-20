@@ -1,22 +1,22 @@
 
 // Load web app
-require('./cloud/app.js');
+require('./app.js');
 
 var _ = require('underscore');
-var env = require('./cloud/env.js').env;
-var auth = require('./cloud/auth.js');
-var api = require('./cloud/api.js');
-var admin = require('./cloud/admin.js');
-var r = require('./cloud/requests.js');
-var analytics = require('./cloud/analytics.js');
-var dashboard = require('./cloud/dashboard.js');
-var coreActions = require('./cloud/coreActions.js');
-var wineSearch = require('./cloud/wineSearch.js'); // registers background job
-var mixpanelExperiments = require('./cloud/mixpanelExperiments.js');
-var notifications = require('./cloud/notifications.js');
-var migrations = require('./cloud/migrations.js'); // registers background jobs
-var wineSpecials = require('./cloud/wineSpecials.js'); // registers background job
-var slackHooks = require('./cloud/slack-hooks.js');//sends notifications to slack
+var env = require('./env.js').env;
+var auth = require('./auth.js');
+var api = require('./api.js');
+var admin = require('./admin.js');
+var r = require('./requests.js');
+var analytics = require('./analytics.js');
+var dashboard = require('./dashboard.js');
+var coreActions = require('./coreActions.js');
+var wineSearch = require('./wineSearch.js'); // registers background job
+var mixpanelExperiments = require('./mixpanelExperiments.js');
+var notifications = require('./notifications.js');
+var migrations = require('./migrations.js'); // registers background jobs
+var wineSpecials = require('./wineSpecials.js'); // registers background job
+var slackHooks = require('./slack-hooks.js');//sends notifications to slack
 
 var allPosts;
 var results = [];
@@ -30,17 +30,16 @@ _.each(api, function(exported, name) {
 
 // A method for calling from command-line for testing things.
 Parse.Cloud.define("debug", function(request, response) {
-    auth.requireAdmin().then(function() {
+    auth.requireAdmin(request.user).then(function() {
         response.success("ok");
     }, r.fail(response));
 });
 
 Parse.Cloud.define("migrateUserLifecycles", function(request, response) {
     function doMigration() {
-        Parse.Cloud.useMasterKey();
         var query = new Parse.Query('User');
         query.doesNotExist('lifecycle');
-        var promise = query.find().then(function(users) {
+        var promise = query.find({useMasterKey: true}).then(function(users) {
             var promises = [];
             users.forEach(function(user) {
                 var lifecycle = {};
@@ -280,7 +279,7 @@ Parse.Cloud.define("getWinesFromUser", function(request, response) {
 });
 
 Parse.Cloud.define("sendEmail", function(request, response) {
-    auth.requireAdmin().then(function() {
+    auth.requireAdmin(request.user).then(function() {
         var toUser = request.params.toUser;
         var toEmail = request.params.toEmail;
         var subject = request.params.subject;
@@ -315,8 +314,8 @@ Parse.Cloud.define("removeOrder", function(request, response) {
                                             query = new Parse.Query("User");
                                             query.get(userId,{
                                                 success:function(user){
-                                                Parse.Cloud.useMasterKey()//use master key to modify users
                                                     user.relation("orders").query().count({
+                                                        useMasterKey: true,
                                                         success:function(orderCount){
                                                             user.set('orderNumber',orderCount);
                                                             user.set("exported",false);
@@ -349,7 +348,6 @@ Parse.Cloud.define("removeOrder", function(request, response) {
 
 
 Parse.Cloud.define("removeWine", function(request, response) {
-    Parse.Cloud.useMasterKey();//use master key to operate post
     var wineId = request.params.wineId;
     var Wine = Parse.Object.extend('Wine');
     var wine = new Wine();
@@ -358,6 +356,7 @@ Parse.Cloud.define("removeWine", function(request, response) {
     var queryP = new Parse.Query("Post");
         queryP.equalTo("wine", wine);
         queryP.find({
+            useMasterKey: true,
             success : function(posts) {
                 if(posts.length!=0){
                     //unset wine field in post
@@ -370,7 +369,7 @@ Parse.Cloud.define("removeWine", function(request, response) {
 
                     Parse.Object.saveAll(posts,function(list,error){
                         if(list){//success
-                            wine.save({"deleted":true},{
+                            wine.save({"deleted":true, useMasterKey: true},{
                                 success : function(myObject) {
                                     response.success(myObject);
                                 },
@@ -384,7 +383,7 @@ Parse.Cloud.define("removeWine", function(request, response) {
                     });
 
                 }else{//no posts link to this wine. just delete wine
-                    wine.save({"deleted":true},{
+                    wine.save({"deleted":true, useMasterKey: true},{
                         success : function(myObject) {
                             response.success(myObject);
                         },
@@ -449,7 +448,7 @@ function updateUserLifecycle(user, lifecycle) {
  * FYI a read-modify-write race condition exists here, but we don't expect calls to this to be racy.
  */
 Parse.Cloud.define("userLifecycleCheck", function(request, response) {
-    var currentUser = Parse.User.current();
+    var currentUser = request.user;
     if (!currentUser) {
         response.error("There must be a current user.");
     } else {
@@ -592,7 +591,6 @@ Parse.Cloud.beforeSave("_User", function(request, response) {
     var user = request.object;
     var flag = user.get('changeExportFlag');
     if (flag) {
-        Parse.Cloud.useMasterKey();
         user.set("exported", false);
     }
     user.set("changeExportFlag", true);
@@ -617,7 +615,6 @@ Parse.Cloud.beforeSave("_User", function(request, response) {
             query.equalTo('following', user);
             query.find({
                 success: function (allFollowers) {
-                    Parse.Cloud.useMasterKey();
                     user.set("follower_count", allFollowers.length);
                     var following = user.get("following");
                     user.set("following_count", following instanceof Array ? following.length : 0);
@@ -643,7 +640,6 @@ Parse.Cloud.afterSave("_User", function(request) {
 Parse.Cloud.beforeSave("Order", function(request, response) {
 	var flag = request.object.get('changeExportFlag');
     if(flag){
-        Parse.Cloud.useMasterKey();
         request.object.set("exported",false);
     }
     request.object.set("changeExportFlag",true);
@@ -654,7 +650,6 @@ Parse.Cloud.beforeSave("Order", function(request, response) {
 Parse.Cloud.beforeSave("Post", function(request, response) {
 	var flag = request.object.get('changeExportFlag');
     if(flag){
-        Parse.Cloud.useMasterKey();
         request.object.set("exported",false);
     }
     request.object.set("changeExportFlag",true);
@@ -665,7 +660,6 @@ Parse.Cloud.beforeSave("Post", function(request, response) {
 Parse.Cloud.beforeSave("Wine", function(request, response) {
 	var flag = request.object.get('changeExportFlag');
     if(flag){
-        Parse.Cloud.useMasterKey();
         request.object.set("exported",false);
     }
     request.object.set("changeExportFlag",true);
@@ -813,9 +807,9 @@ Parse.Cloud.afterSave("Order", function(request) {//save the order to user and w
                             query = new Parse.Query(User);
                             query.get(userId, {
                                 success:function(user){
-                                    Parse.Cloud.useMasterKey(); //use master key to modify users
                                     relation = user.relation('orders');
                                     relation.query().count({
+                                        useMasterKey: true,
                                         success:function(orderCount){
                                             relation.add(order);//add order to user
                                             user.set('orderNumber',orderCount*1+1);

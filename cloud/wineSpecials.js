@@ -3,9 +3,9 @@ var exports;
 (function() {
     "use strict";
 
-    var activityService = require('./cloud/activities.js');
+    var activityService = require('./activities.js');
     var ActivityType = activityService.ActivityType;
-    var notifications = require('./cloud/notifications.js');
+    var notifications = require('./notifications.js');
 
     var WineSpecial = Parse.Object.extend('WineSpecial');
     var Activity = Parse.Object.extend('Activity');
